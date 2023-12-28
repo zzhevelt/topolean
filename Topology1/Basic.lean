@@ -69,11 +69,11 @@ namespace s0
   theorem subset_iff_compl_subset {X : Set α} (S₁ S₂ : Set α) (h₁: S₁ ⊆ X) (h₂: S₂ ⊆ X):
     S₁ ⊆ S₂ ↔ X \ S₂ ⊆ X \ S₁ :=
       ⟨ Set.diff_subset_diff_right,
-      by
-      intros h a ha
-      have h': X \ (X \ S₁) ⊆ X \ (X \ S₂) := Set.diff_subset_diff_right h
-      rw [Set.diff_diff_cancel_left h₁, Set.diff_diff_cancel_left h₂] at h'
-      exact h' ha ⟩
+        by
+        intros h a ha
+        have h': X \ (X \ S₁) ⊆ X \ (X \ S₂) := Set.diff_subset_diff_right h
+        rw [Set.diff_diff_cancel_left h₁, Set.diff_diff_cancel_left h₂] at h'
+        exact h' ha ⟩
 end s0
 
 -- 1. METRIC SPACES
@@ -84,21 +84,21 @@ namespace s1
 
   class MetricSpace (α : Type u) where
     d: α → α → ℝ
-    d_nonneg: ∀ x y : α, d x y ≥ 0
-    d_symmetry: ∀ x y : α, d x y = d y x
-    d_triangle: ∀ x y z : α, d x z ≤ d x y + d y z
-    d_nondegeneracy: ∀ x y : α, d x y = 0 ↔ x = y
+    d_nonneg: ∀ x y: α,        d x y ≥ 0
+    d_symmetry: ∀ x y: α,      d x y = d y x
+    d_triangle: ∀ x y z: α,    d x z ≤ d x y + d y z
+    d_nondegeneracy: ∀ x y: α, d x y = 0 ↔ x = y
 
   -- Definition 1.2
   -- open balls
 
   -- note: no restriction on ε > 0
   def openBall   [ms: MetricSpace α] (x: α) (ε: ℝ):=
-    { y : α | ms.d x y < ε}
+    { y : α | ms.d x y < ε }
   def closedBall [ms: MetricSpace α] (x: α) (ε: ℝ):=
-    { y : α | ms.d x y ≤ ε}
+    { y : α | ms.d x y ≤ ε }
   def sphere     [ms: MetricSpace α] (x: α) (ε: ℝ):=
-    { y : α | ms.d x y = ε}
+    { y : α | ms.d x y = ε }
 
   lemma center_in_open_ball [MetricSpace α] (x: α) {ε: ℝ} (εpos: ε > 0): x ∈ openBall x ε :=
     by simp[openBall, show MetricSpace.d x x = 0 by simp[MetricSpace.d_nondegeneracy]]; linarith;
@@ -113,10 +113,10 @@ namespace s1
 
   class NormedVectorSpace (V : Type u) extends AddCommGroup V, Module ℝ V where
     norm: V → ℝ
-    norm_nonneg: ∀ v: V, norm v ≥ 0
+    norm_nonneg: ∀ v: V,            norm v ≥ 0
     norm_linearity: ∀ c: ℝ, ∀ v: V, norm (c • v) = (|c| * norm v)
-    norm_triangle: ∀ v w: V, norm (v + w) ≤ norm v + norm w
-    norm_nondegeneracy: ∀ v: V, norm v = 0 → v = 0
+    norm_triangle: ∀ v w: V,        norm (v + w) ≤ norm v + norm w
+    norm_nondegeneracy: ∀ v: V,     norm v = 0 → v = 0
 
   -- Proposition 1.5
   -- normed vector space is metric space
@@ -162,8 +162,6 @@ namespace s1
     -- Definition 1.11
     -- neighbourhood and open set
 
-    variable (X: MetricSpace α)
-
     def neighbourhood [MetricSpace α] (U: Set α) (x: α) :=
       ∃ ε > 0, openBall x ε ⊆ U
 
@@ -173,12 +171,10 @@ namespace s1
     def openNeighbourhood [MetricSpace α] (U: Set α) (x: α):=
       neighbourhood U x ∧ openSubset U
 
-    theorem openNeighbourhood_eq (U: Set α) (x: α):
+    theorem openNeighbourhood_eq [MetricSpace α] (U: Set α) (x: α):
       openNeighbourhood U x ↔ openSubset U ∧ x ∈ U :=
         ⟨ by
-          intro ⟨hn, hos⟩
-          cases hn with | intro ε h' =>
-          cases h' with | intro εpos h' =>
+          intro ⟨⟨ε, εpos, h'⟩, hos⟩
           exact ⟨hos, Set.mem_of_subset_of_mem h' (center_in_open_ball x εpos)⟩,
 
           by intro ⟨h, h'⟩; exact ⟨h x h', h⟩⟩
@@ -213,7 +209,7 @@ namespace s1
     -- continuity in terms of open sets
 
     def continuous [MetricSpace α] [MetricSpace β] (f: α → β) :=
-      ∀ Oy : Set β, openSubset Oy → openSubset (f⁻¹' Oy)
+      ∀ Oy: Set β, openSubset Oy → openSubset (f⁻¹' Oy)
 
     theorem continuous_eps_eq_continuous [MetricSpace α] [MetricSpace β] (f: α → β):
       continuous_eps f ↔ continuous f := by
@@ -261,13 +257,13 @@ namespace s1
     def sequence (_: ℕ → α) := true
     def injective_on_nat (f: ℕ → ℕ) := ∀ a b, f a = f b → a = b
     def sub_sequence (x: ℕ → α) (y: ℕ → α) :=
-      ∃ ι: ℕ → ℕ, injective_on_nat ι ∧ y = x∘ι  -- y is subsequence of x
+      ∃ ι: ℕ → ℕ, injective_on_nat ι ∧ y = x ∘ ι  -- y is subsequence of x
 
     -- Definition 1.17
     -- convergence to limit of a sequence
 
     def converges_to [ms: MetricSpace α] (x: ℕ → α) (a: α) :=
-      ∀ ε > (0:ℝ), ∃ n: ℕ, ∀i > n, ms.d (x i) a < ε
+      ∀ ε > 0, ∃ n: ℕ, ∀ i > n, ms.d (x i) a < ε
     def converges [MetricSpace α] (x: ℕ → α):=
       ∃ a: α, converges_to x a
 
@@ -275,7 +271,7 @@ namespace s1
     -- Cauchy sequence
 
     def cauchy_sequence [ms: MetricSpace α] (x: ℕ → α) :=
-      ∀ ε > (0:ℝ), ∃ n: ℕ, ∀i > n, ∀j > n,  ms.d (x i) (x j) < ε
+      ∀ ε > 0, ∃ n: ℕ, ∀ i > n, ∀ j > n, ms.d (x i) (x j) < ε
 
     -- Definition 1.19
     -- complete metric space
@@ -284,7 +280,7 @@ namespace s1
       ∀ x: ℕ → α, cauchy_sequence x → converges x
 
     class NormedVectorSpaceWithMetricSpace (V : Type u) extends NormedVectorSpace V where
-      ms := toNormedVectorSpace.toMetricSpace
+      metric_space := toNormedVectorSpace.toMetricSpace
 
     class BanachSpace (V : Type u) extends NormedVectorSpaceWithMetricSpace V where
       completeness: ∀ x: ℕ → V, cauchy_sequence x → converges x
@@ -293,7 +289,7 @@ namespace s1
     -- sequentially compact metric space
 
     def sequentially_compact [MetricSpace α] (_: MetricSpace α) :=
-      ∀ x: ℕ → α, ∃ ι: ℕ → ℕ, injective_on_nat ι ∧ converges (x∘ι)
+      ∀ x: ℕ → α, ∃ ι: ℕ → ℕ, injective_on_nat ι ∧ converges (x ∘ ι)
 
     -- Proposition 1.21
     -- sequentially compact metric spaces are equivalently compact metric spaces
@@ -301,7 +297,7 @@ namespace s1
     variable (σ : Type)
     theorem seq_compactness_eq_compactness [X: MetricSpace α]:
       sequentially_compact X ↔
-      ∀ I: Set σ, ∀ U : σ → Set α, ((∀i ∈ I, openSubset (U i)) ∧ α = (⋃ (i ∈ I), U i)) →
+      ∀ I: Set σ, ∀ U: σ → Set α, ((∀i ∈ I, openSubset (U i)) ∧ α = (⋃ (i ∈ I), U i)) →
         ∃ J ⊆ I, Finite J ∧ α = (⋃ (j ∈ J), U j) := sorry
 
 end s1
